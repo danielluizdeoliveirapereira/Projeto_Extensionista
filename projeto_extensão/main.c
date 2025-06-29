@@ -6,30 +6,42 @@
 
 #define MAX 100
 
+
+int main()
+{
+    srand(time(NULL));
+    loginSistema();
+    return 0;
+}
+
 // === ESTRUTURAS ===
-typedef struct {
+typedef struct
+{
     int id;
     char nome[50];
     float preco_custo;
     float preco_venda;
     int quantidade;
-    char validade[11]; // dd/mm/yyyy
+    char validade[11]; // dd/mm/aaaa
 } Produto;
 
-typedef struct {
+typedef struct
+{
     char nome[50];
     char cpf[15];
 } Cliente;
 
-typedef struct {
+typedef struct
+{
     char nome[50];
     char login[20];
     char senha[20];
     int nivel; // 1 = ADM, 2 = FUNC
 } Usuario;
 
-// === FUNÇÕES AUXILIARES ===
-int confirmar(char *mensagem) {
+// === FUNÃ‡Ã•ES AUXILIARES ===
+int confirmar(char *mensagem)
+{
     char op;
     printf("%s (s/n): ", mensagem);
     scanf(" %c", &op);
@@ -37,11 +49,13 @@ int confirmar(char *mensagem) {
     return (op == 's' || op == 'S');
 }
 
-float sugerirPrecoVenda(float custo) {
+float sugerirPrecoVenda(float custo)
+{
     return custo * 1.5; // margem de 50%
 }
 
-int diasParaValidade(char *data) {
+int diasParaValidade(char *data)
+{
     struct tm validade = {0};
     time_t t = time(NULL);
 
@@ -54,26 +68,31 @@ int diasParaValidade(char *data) {
     return (int)(diff / (60 * 60 * 24));
 }
 
-void registrarCaixa(float valor, int tipo) {
+void registrarCaixa(float valor, int tipo)
+{
     FILE *fp = fopen("caixa.txt", "a");
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
     char data[11];
     sprintf(data, "%02d/%02d/%04d", tm.tm_mday, tm.tm_mon+1, tm.tm_year+1900);
 
-    if (fp) {
+    if (fp)
+    {
         fprintf(fp, "%s - %s: R$ %.2f\n", data, tipo == 1 ? "ENTRADA" : "SAIDA", valor);
         fclose(fp);
     }
 }
 
-int validarLogin(char login[], char senha[], int *nivel) {
+int validarLogin(char login[], char senha[], int *nivel)
+{
     Usuario u;
     FILE *fp = fopen("usuarios.txt", "rb");
     if (!fp) return 0;
 
-    while (fread(&u, sizeof(Usuario), 1, fp)) {
-        if (strcmp(u.login, login) == 0 && strcmp(u.senha, senha) == 0) {
+    while (fread(&u, sizeof(Usuario), 1, fp))
+        {
+        if (strcmp(u.login, login) == 0 && strcmp(u.senha, senha) == 0)
+        {
             *nivel = u.nivel;
             fclose(fp);
             return 1;
@@ -83,12 +102,14 @@ int validarLogin(char login[], char senha[], int *nivel) {
     return 0;
 }
 
-int produtoExiste(char nome[]) {
+int produtoExiste(char nome[])
+{
     Produto temp;
     FILE *fp = fopen("produtos.txt", "rb");
     if (!fp) return 0;
 
-    while (fread(&temp, sizeof(Produto), 1, fp)) {
+    while (fread(&temp, sizeof(Produto), 1, fp))
+        {
         if (strcmp(temp.nome, nome) == 0) {
             fclose(fp);
             return 1;
@@ -98,13 +119,16 @@ int produtoExiste(char nome[]) {
     return 0;
 }
 
-int clienteExiste(char cpf[]) {
+int clienteExiste(char cpf[])
+{
     Cliente c;
     FILE *fp = fopen("clientes.txt", "rb");
     if (!fp) return 0;
 
-    while (fread(&c, sizeof(Cliente), 1, fp)) {
-        if (strcmp(c.cpf, cpf) == 0) {
+    while (fread(&c, sizeof(Cliente), 1, fp))
+        {
+        if (strcmp(c.cpf, cpf) == 0)
+        {
             fclose(fp);
             return 1;
         }
@@ -113,13 +137,16 @@ int clienteExiste(char cpf[]) {
     return 0;
 }
 
-int usuarioExiste(char login[]) {
+int usuarioExiste(char login[])
+{
     Usuario u;
     FILE *fp = fopen("usuarios.txt", "rb");
     if (!fp) return 0;
 
-    while (fread(&u, sizeof(Usuario), 1, fp)) {
-        if (strcmp(u.login, login) == 0) {
+    while (fread(&u, sizeof(Usuario), 1, fp))
+        {
+        if (strcmp(u.login, login) == 0)
+        {
             fclose(fp);
             return 1;
         }
@@ -128,42 +155,48 @@ int usuarioExiste(char login[]) {
     return 0;
 }
 
-// === FUNÇÕES PRINCIPAIS ===
+// === FUNÃ‡Ã•ES PRINCIPAIS ===
 
-void cadastrarProduto() {
+void cadastrarProduto()
+{
     Produto p;
     FILE *fp = fopen("produtos.txt", "a+b");
-    if (!fp) {
+    if (!fp)
+        {
         printf("Erro ao abrir arquivo de produtos.\n");
         return;
-    }
+        }
 
     printf("Nome do produto: ");
     fgets(p.nome, sizeof(p.nome), stdin);
     p.nome[strcspn(p.nome, "\n")] = 0;
 
-    if (produtoExiste(p.nome)) {
+    if (produtoExiste(p.nome))
+        {
         printf("Produto com esse nome ja existe.\n");
         fclose(fp);
         return;
-    }
+        }
 
     char buffer[50];
 
-    while (1) {
+    while (1)
+        {
         printf("Preco de custo: R$ ");
         if (!fgets(buffer, sizeof(buffer), stdin)) continue;
         if (sscanf(buffer, "%f", &p.preco_custo) == 1 && p.preco_custo >= 0) break;
         printf("Entrada invalida. Tente novamente.\n");
-    }
+        }
 
     p.preco_venda = sugerirPrecoVenda(p.preco_custo);
 
-    while (1) {
+    while (1)
+        {
         printf("Estoque inicial: ");
         if (!fgets(buffer, sizeof(buffer), stdin)) continue;
         int qtd;
-        if (sscanf(buffer, "%d", &qtd) == 1 && qtd >= 0) {
+        if (sscanf(buffer, "%d", &qtd) == 1 && qtd >= 0)
+        {
             p.quantidade = qtd;
             break;
         }
@@ -181,7 +214,8 @@ void cadastrarProduto() {
     printf("Produto cadastrado com sucesso!\n");
 }
 
-void atualizarProduto() {
+void atualizarProduto()
+{
     char nome[50];
     Produto p;
     int encontrado = 0;
@@ -191,32 +225,38 @@ void atualizarProduto() {
     nome[strcspn(nome, "\n")] = 0;
 
     FILE *fp = fopen("produtos.txt", "r+b");
-    if (!fp) {
+    if (!fp)
+        {
         printf("Erro ao abrir arquivo de produtos.\n");
         return;
-    }
+        }
 
     char buffer[50];
 
-    while (fread(&p, sizeof(Produto), 1, fp)) {
-        if (strcmp(p.nome, nome) == 0) {
+    while (fread(&p, sizeof(Produto), 1, fp))
+        {
+        if (strcmp(p.nome, nome) == 0)
+        {
             encontrado = 1;
             printf("Atualizando produto '%s'\n", p.nome);
 
-            while (1) {
-                printf("Novo preco de custo: R$ ");
+            while (1)
+                {
+                printf("Novo preÃ§o de custo: R$ ");
                 if (!fgets(buffer, sizeof(buffer), stdin)) continue;
                 if (sscanf(buffer, "%f", &p.preco_custo) == 1 && p.preco_custo >= 0) break;
                 printf("Entrada invalida. Tente novamente.\n");
-            }
+                }
 
             p.preco_venda = sugerirPrecoVenda(p.preco_custo);
 
-            while (1) {
+            while (1)
+                {
                 printf("Nova quantidade em estoque: ");
                 if (!fgets(buffer, sizeof(buffer), stdin)) continue;
                 int qtd;
-                if (sscanf(buffer, "%d", &qtd) == 1 && qtd >= 0) {
+                if (sscanf(buffer, "%d", &qtd) == 1 && qtd >= 0)
+                {
                     p.quantidade = qtd;
                     break;
                 }
@@ -235,12 +275,14 @@ void atualizarProduto() {
     }
     fclose(fp);
 
-    if (!encontrado) {
+    if (!encontrado)
+        {
         printf("Produto nao encontrado.\n");
-    }
+        }
 }
 
-void excluirProduto() {
+void excluirProduto()
+{
     char nome[50];
     Produto p;
     int encontrado = 0;
@@ -250,26 +292,32 @@ void excluirProduto() {
     nome[strcspn(nome, "\n")] = 0;
 
     FILE *fp = fopen("produtos.txt", "rb");
-    if (!fp) {
+    if (!fp)
+        {
         printf("Arquivo de produtos nao encontrado.\n");
         return;
-    }
+        }
     FILE *temp = fopen("temp.txt", "wb");
-    if (!temp) {
+    if (!temp)
+    {
         fclose(fp);
         printf("Erro ao criar arquivo temporario.\n");
         return;
     }
 
-    while (fread(&p, sizeof(Produto), 1, fp)) {
-        if (strcmp(p.nome, nome) == 0) {
+    while (fread(&p, sizeof(Produto), 1, fp))
+        {
+        if (strcmp(p.nome, nome) == 0)
+        {
             encontrado = 1;
-            if (!confirmar("Confirma exclusao do produto?")) {
+            if (!confirmar("Confirma exclusao do produto?"))
+            {
                 fwrite(&p, sizeof(Produto), 1, temp);
             } else {
                 printf("Produto excluido.\n");
             }
-        } else {
+        } else
+        {
             fwrite(&p, sizeof(Produto), 1, temp);
         }
     }
@@ -283,13 +331,15 @@ void excluirProduto() {
     if (!encontrado) printf("Produto nao encontrado.\n");
 }
 
-void cadastrarCliente() {
+void cadastrarCliente()
+{
     Cliente c;
     FILE *fp = fopen("clientes.txt", "ab");
-    if (!fp) {
+    if (!fp)
+        {
         printf("Erro ao abrir arquivo de clientes.\n");
         return;
-    }
+        }
 
     printf("Nome do cliente: ");
     fgets(c.nome, sizeof(c.nome), stdin);
@@ -299,18 +349,20 @@ void cadastrarCliente() {
     fgets(c.cpf, sizeof(c.cpf), stdin);
     c.cpf[strcspn(c.cpf, "\n")] = 0;
 
-    if (clienteExiste(c.cpf)) {
+    if (clienteExiste(c.cpf))
+        {
         printf("Cliente com esse CPF ja cadastrado.\n");
         fclose(fp);
         return;
-    }
+        }
 
     fwrite(&c, sizeof(Cliente), 1, fp);
     fclose(fp);
     printf("Cliente cadastrado com sucesso!\n");
 }
 
-void excluirCliente() {
+void excluirCliente()
+{
     char cpf[15];
     Cliente c;
     int encontrado = 0;
@@ -320,26 +372,32 @@ void excluirCliente() {
     cpf[strcspn(cpf, "\n")] = 0;
 
     FILE *fp = fopen("clientes.txt", "rb");
-    if (!fp) {
+    if (!fp)
+        {
         printf("Arquivo de clientes nao encontrado.\n");
         return;
-    }
+        }
     FILE *temp = fopen("temp.txt", "wb");
-    if (!temp) {
+    if (!temp)
+    {
         fclose(fp);
         printf("Erro ao criar arquivo temporario.\n");
         return;
     }
 
-    while (fread(&c, sizeof(Cliente), 1, fp)) {
-        if (strcmp(c.cpf, cpf) == 0) {
+    while (fread(&c, sizeof(Cliente), 1, fp))
+        {
+        if (strcmp(c.cpf, cpf) == 0)
+        {
             encontrado = 1;
-            if (!confirmar("Confirma exclusao do cliente?")) {
+            if (!confirmar("Confirma exclusao do cliente?"))
+            {
                 fwrite(&c, sizeof(Cliente), 1, temp);
             } else {
                 printf("Cliente excluido.\n");
             }
-        } else {
+        } else
+        {
             fwrite(&c, sizeof(Cliente), 1, temp);
         }
     }
@@ -353,13 +411,15 @@ void excluirCliente() {
     if (!encontrado) printf("Cliente nao encontrado.\n");
 }
 
-void cadastrarFuncionario() {
+void cadastrarFuncionario()
+{
     Usuario u;
     FILE *fp = fopen("usuarios.txt", "ab");
-    if (!fp) {
+    if (!fp)
+        {
         printf("Erro ao abrir arquivo de usuarios.\n");
         return;
-    }
+        }
 
     printf("Nome do funcionario: ");
     fgets(u.nome, sizeof(u.nome), stdin);
@@ -369,7 +429,8 @@ void cadastrarFuncionario() {
         printf("Login do funcionario: ");
         fgets(u.login, sizeof(u.login), stdin);
         u.login[strcspn(u.login, "\n")] = 0;
-        if (usuarioExiste(u.login)) {
+        if (usuarioExiste(u.login))
+            {
             printf("Login ja existe. Escolha outro.\n");
         } else {
             break;
@@ -387,7 +448,8 @@ void cadastrarFuncionario() {
     printf("Funcionario cadastrado com sucesso!\n");
 }
 
-void excluirFuncionario() {
+void excluirFuncionario()
+{
     char login[20];
     Usuario u;
     int encontrado = 0;
@@ -397,26 +459,33 @@ void excluirFuncionario() {
     login[strcspn(login, "\n")] = 0;
 
     FILE *fp = fopen("usuarios.txt", "rb");
-    if (!fp) {
+    if (!fp)
+        {
         printf("Arquivo de usuarios nao encontrado.\n");
         return;
-    }
+        }
     FILE *temp = fopen("temp.txt", "wb");
-    if (!temp) {
+    if (!temp)
+    {
         fclose(fp);
         printf("Erro ao criar arquivo temporario.\n");
         return;
     }
 
-    while (fread(&u, sizeof(Usuario), 1, fp)) {
-        if (strcmp(u.login, login) == 0) {
+    while (fread(&u, sizeof(Usuario), 1, fp))
+        {
+        if (strcmp(u.login, login) == 0)
+        {
             encontrado = 1;
-            if (!confirmar("Confirma exclusao do funcionario?")) {
+            if (!confirmar("Confirma exclusao do funcionario?"))
+            {
                 fwrite(&u, sizeof(Usuario), 1, temp);
-            } else {
+            } else
+            {
                 printf("Funcionario excluido.\n");
             }
-        } else {
+        } else
+        {
             fwrite(&u, sizeof(Usuario), 1, temp);
         }
     }
@@ -430,7 +499,8 @@ void excluirFuncionario() {
     if (!encontrado) printf("Funcionario nao encontrado.\n");
 }
 
-void registrarVenda() {
+void registrarVenda()
+{
     char nomeProduto[50];
     int qtd;
     float valorPago, troco;
@@ -442,48 +512,55 @@ void registrarVenda() {
     nomeProduto[strcspn(nomeProduto, "\n")] = 0;
 
     FILE *fp = fopen("produtos.txt", "r+b");
-    if (!fp) {
+    if (!fp)
+        {
         printf("Erro ao abrir arquivo de produtos.\n");
         return;
-    }
+        }
 
-    while (fread(&p, sizeof(Produto), 1, fp)) {
-        if (strcmp(p.nome, nomeProduto) == 0) {
+    while (fread(&p, sizeof(Produto), 1, fp))
+        {
+        if (strcmp(p.nome, nomeProduto) == 0)
+        {
             encontrado = 1;
             break;
         }
     }
 
-    if (!encontrado) {
+    if (!encontrado)
+        {
         printf("Produto nao encontrado.\n");
         fclose(fp);
         return;
-    }
+        }
 
     char buffer[50];
 
-    while (1) {
+    while (1)
+        {
         printf("Quantidade vendida: ");
         if (!fgets(buffer, sizeof(buffer), stdin)) continue;
         if (sscanf(buffer, "%d", &qtd) == 1 && qtd > 0) break;
         printf("Entrada invalida. Tente novamente.\n");
-    }
+        }
 
-    if (qtd > p.quantidade) {
+    if (qtd > p.quantidade)
+        {
         printf("Estoque insuficiente.\n");
         fclose(fp);
         return;
-    }
+        }
 
     float valorTotal = qtd * p.preco_venda;
     printf("Valor total: R$ %.2f\n", valorTotal);
 
-    while (1) {
+    while (1)
+        {
         printf("Valor pago: R$ ");
         if (!fgets(buffer, sizeof(buffer), stdin)) continue;
         if (sscanf(buffer, "%f", &valorPago) == 1 && valorPago >= valorTotal) break;
         printf("Valor pago insuficiente ou invalido. Tente novamente.\n");
-    }
+        }
 
     troco = valorPago - valorTotal;
     printf("Troco: R$ %.2f\n", troco);
@@ -496,7 +573,8 @@ void registrarVenda() {
     registrarCaixa(valorTotal, 1);
 
     FILE *vfp = fopen("vendas.txt", "a");
-    if (vfp) {
+    if (vfp)
+        {
         time_t t = time(NULL);
         struct tm tm = *localtime(&t);
         char data[20];
@@ -507,7 +585,7 @@ void registrarVenda() {
         fprintf(vfp, "%s | Produto: %s | Quantidade: %d | Valor total: R$ %.2f\n",
                 data, nomeProduto, qtd, valorTotal);
         fclose(vfp);
-    }
+        }
 
     printf("Venda registrada com sucesso!\n");
 }
@@ -524,23 +602,28 @@ void controleDesperdicio() {
 
     char buffer[50];
 
-    while (1) {
+    while (1)
+        {
         printf("Quantidade perdida: ");
         if (!fgets(buffer, sizeof(buffer), stdin)) continue;
         if (sscanf(buffer, "%d", &qtd) == 1 && qtd > 0) break;
         printf("Entrada invalida. Tente novamente.\n");
-    }
+        }
 
     FILE *fp = fopen("produtos.txt", "r+b");
-    if (!fp) {
+    if (!fp)
+        {
         printf("Erro ao abrir arquivo de produtos.\n");
         return;
-    }
+        }
 
-    while (fread(&p, sizeof(Produto), 1, fp)) {
-        if (strcmp(p.nome, nome) == 0) {
+    while (fread(&p, sizeof(Produto), 1, fp))
+        {
+        if (strcmp(p.nome, nome) == 0)
+        {
             achou = 1;
-            if (p.quantidade < qtd) {
+            if (p.quantidade < qtd)
+            {
                 printf("Quantidade informada excede o estoque disponivel.\n");
                 fclose(fp);
                 return;
@@ -553,111 +636,134 @@ void controleDesperdicio() {
     }
     fclose(fp);
 
-    if (!achou) {
+    if (!achou)
+        {
         printf("Produto nao encontrado.\n");
         return;
-    }
+        }
 
     FILE *dfp = fopen("desperdicio.txt", "a");
-    if (dfp) {
+    if (dfp)
+        {
         fprintf(dfp, "%s - %d unidades\n", nome, qtd);
         fclose(dfp);
         printf("Desperdicio registrado.\n");
-    } else {
+        } else
+        {
         printf("Erro ao registrar desperdicio.\n");
-    }
+        }
 }
 
-void verificarValidade() {
+void verificarValidade()
+{
     Produto p;
     int alertas = 0;
     FILE *fp = fopen("produtos.txt", "rb");
-    if (!fp) {
+    if (!fp)
+        {
         printf("Nenhum produto cadastrado.\n");
         return;
-    }
+        }
 
     printf("Produtos proximos da validade (menos de 7 dias):\n");
-    while (fread(&p, sizeof(Produto), 1, fp)) {
+    while (fread(&p, sizeof(Produto), 1, fp))
+        {
         int dias = diasParaValidade(p.validade);
-        if (dias >= 0 && dias <= 7) {
+        if (dias >= 0 && dias <= 7)
+        {
             printf("Produto: %s | Validade: %s | Dias restantes: %d | Sugestao promocao: 20%% off\n",
                    p.nome, p.validade, dias);
             alertas++;
         }
     }
     fclose(fp);
-    if (!alertas) {
+    if (!alertas)
+    {
         printf("Nenhum produto esta proximo da validade.\n");
     }
 }
 
-void visualizarEstoque() {
+void visualizarEstoque()
+{
     Produto p;
     FILE *fp = fopen("produtos.txt", "rb");
-    if (!fp) {
+    if (!fp)
+        {
         printf("Nenhum produto cadastrado.\n");
         return;
-    }
+        }
     printf("=== Estoque Atual ===\n");
-    while (fread(&p, sizeof(Produto), 1, fp)) {
-        printf("Produto: %s | Quantidade: %d | Validade: %s | Preco Venda: R$ %.2f\n",
+    while (fread(&p, sizeof(Produto), 1, fp))
+    {
+        printf("Produto: %s | Quantidade: %d | Validade: %s | PreÃ§o Venda: R$ %.2f\n",
                p.nome, p.quantidade, p.validade, p.preco_venda);
     }
     fclose(fp);
 }
 
-void visualizarClientes() {
+void visualizarClientes()
+{
     Cliente c;
     FILE *fp = fopen("clientes.txt", "rb");
-    if (!fp) {
+    if (!fp)
+        {
         printf("Nenhum cliente cadastrado.\n");
         return;
-    }
+        }
     printf("=== Clientes Cadastrados ===\n");
-    while (fread(&c, sizeof(Cliente), 1, fp)) {
+    while (fread(&c, sizeof(Cliente), 1, fp))
+    {
         printf("Nome: %s | CPF: %s\n", c.nome, c.cpf);
     }
     fclose(fp);
 }
 
-void visualizarFuncionarios() {
+void visualizarFuncionarios()
+{
     Usuario u;
     FILE *fp = fopen("usuarios.txt", "rb");
-    if (!fp) {
+    if (!fp)
+        {
         printf("Nenhum funcionario cadastrado.\n");
         return;
-    }
+        }
     printf("=== Funcionarios Cadastrados ===\n");
-    while (fread(&u, sizeof(Usuario), 1, fp)) {
+    while (fread(&u, sizeof(Usuario), 1, fp))
+    {
         printf("Nome: %s | Login: %s | Nivel: %s\n", u.nome, u.login, u.nivel == 1 ? "ADM" : "FUNC");
     }
     fclose(fp);
 }
 
-void visualizarHistoricoVendas() {
+void visualizarHistoricoVendas()
+{
     FILE *fp = fopen("vendas.txt", "r");
-    if (!fp) {
+    if (!fp)
+        {
         printf("Nenhuma venda registrada.\n");
         return;
-    }
+        }
     printf("=== Historico de Vendas ===\n");
     char linha[200];
-    while (fgets(linha, sizeof(linha), fp)) {
+    while (fgets(linha, sizeof(linha), fp))
+    {
         printf("%s", linha);
     }
     fclose(fp);
 }
 
-void visualizarHistoricoDesperdicio() {
+void visualizarHistoricoDesperdicio()
+{
     FILE *fp = fopen("desperdicio.txt", "r");
-    if (!fp) {
+    if (!fp)
+        {
         printf("Nenhum desperdicio registrado.\n");
         return;
-    }
+        }
     printf("=== Historico de Desperdicio ===\n");
     char linha[200];
-    while (fgets(linha, sizeof(linha), fp)) {
+    while (fgets(linha, sizeof(linha), fp))
+    {
         printf("%s", linha);
     }
     fclose(fp);
@@ -665,7 +771,8 @@ void visualizarHistoricoDesperdicio() {
 
 // === MENUS ===
 
-void menuADM() {
+void menuADM()
+{
     int opc;
     char buffer[10];
     do {
@@ -689,12 +796,14 @@ void menuADM() {
 
         if (!fgets(buffer, sizeof(buffer), stdin)) continue;
 
-        if (sscanf(buffer, "%d", &opc) != 1) {
+        if (sscanf(buffer, "%d", &opc) != 1)
+            {
             printf("Opcao invalida. Tente novamente.\n");
             continue;
-        }
+            }
 
-        switch(opc) {
+        switch(opc)
+        {
             case 1: cadastrarProduto(); break;
             case 2: atualizarProduto(); break;
             case 3: excluirProduto(); break;
@@ -716,7 +825,8 @@ void menuADM() {
     } while (opc != 0);
 }
 
-void menuFuncionario() {
+void menuFuncionario()
+{
     int opc;
     char buffer[10];
     do {
@@ -732,12 +842,14 @@ void menuFuncionario() {
 
         if (!fgets(buffer, sizeof(buffer), stdin)) continue;
 
-        if (sscanf(buffer, "%d", &opc) != 1) {
+        if (sscanf(buffer, "%d", &opc) != 1)
+            {
             printf("Opcao invalida. Tente novamente.\n");
             continue;
-        }
+            }
 
-        switch(opc) {
+        switch(opc)
+        {
             case 1: cadastrarProduto(); break;
             case 2: atualizarProduto(); break;
             case 3: registrarVenda(); break;
@@ -751,7 +863,8 @@ void menuFuncionario() {
     } while (opc != 0);
 }
 
-void loginSistema() {
+void loginSistema()
+{
     char login[20], senha[20];
     int nivel;
 
@@ -760,16 +873,14 @@ void loginSistema() {
     printf("Senha: "); fgets(senha, sizeof(senha), stdin);
     senha[strcspn(senha, "\n")] = 0;
 
-    if (validarLogin(login, senha, &nivel)) {
+    if (validarLogin(login, senha, &nivel))
+        {
         if (nivel == 1) menuADM();
         else menuFuncionario();
-    } else {
+        } else
+        {
         printf("Login ou senha incorretos.\n");
-    }
+        }
 }
 
-int main() {
-    srand(time(NULL));
-    loginSistema();
-    return 0;
-}
+
