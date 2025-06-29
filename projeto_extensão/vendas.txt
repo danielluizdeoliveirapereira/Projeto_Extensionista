@@ -1,0 +1,2 @@
+28/06/2025 17:26:41 | Produto: pepsi | Quantidade: 5 | Valor total: R$ 37.50
+28/06/2025 17:58:11 | Produto: coca cola | Quantidade: 6 | Valor total: R$ 45.00

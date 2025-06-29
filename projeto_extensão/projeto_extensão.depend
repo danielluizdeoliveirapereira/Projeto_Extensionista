@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1751143569 source:c:\users\gamer\onedrive\Área de trabalho\projeto de extensão\projeto_extensionista\projeto_extensão\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<sys/stat.h>
+
